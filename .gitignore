@@ -1,0 +1,20 @@
+.DS_Store
+.gitignore
+node_modules
+public
+prof
+tsconfig.tsbuildinfo
+.obsidian
+.quartz-cache
+private/
+.replit
+replit.nix
+.quartz/
+quartz/cli/tui/dist/
+
+# site-specific: content is provided at build time from thrive-incubator/headstart-synthesis
+content/*
+!content/.gitkeep
+headstart-synthesis/
+.firebase/
+firebase-debug.log

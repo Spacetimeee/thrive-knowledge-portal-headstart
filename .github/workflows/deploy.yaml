@@ -1,0 +1,52 @@
+﻿name: Build and deploy to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily rebuild to pick up vault changes (digests land weekly)
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [vault-updated]
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v5
+
+      - name: Checkout vault content
+        uses: actions/checkout@v5
+        with:
+          repository: thrive-incubator/headstart-synthesis
+          path: headstart-synthesis
+          # Full history so Quartz can derive accurate modified dates from git
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Quartz plugins
+        run: npx quartz plugin install --from-config
+
+      - name: Build site from vault
+        run: npx quartz build -d headstart-synthesis/vault
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live
