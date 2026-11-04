@@ -50,3 +50,8 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
           channelId: live
+          # Pinned: firebase-tools >= 15.34.1 checks that the Hosting API is enabled, which
+          # needs serviceusage.services.get. The deploy service account lacks it, so every
+          # deploy since 2026-10-22 failed with a 403. Unpin once the account has
+          # roles/serviceusage.serviceUsageConsumer.
+          firebaseToolsVersion: 15.34.0
